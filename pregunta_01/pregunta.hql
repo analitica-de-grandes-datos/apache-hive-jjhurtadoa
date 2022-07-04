@@ -14,13 +14,21 @@ Escriba el resultado a la carpeta `output` de directorio de trabajo.
         >>> Escriba su respuesta a partir de este punto <<<
 */
 
-DROP TABLE IF EXISTS db;
+DROP TABLE IF EXISTS data;
+DROP TABLE IF EXISTS data_counts;
+CREATE TABLE data (
+  letra string,
+  fecha date,
+  valor int
+  )
+  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+;
 
-CREATE TABLE db (letra STRING, fecha DATE, numero, INT)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+LOAD DATA LOCAL INPATH "data.tsv" INTO TABLE data;
+CREATE TABLE data_counts AS
+    SELECT letra, COUNT(*) AS count
+    FROM data GROUP BY letra ORDER BY letra;
 
-LOAD DATA LOCAL INPATH "data.tsv" OVERWRITE INTO TABLE db;
-
-INSERT OVERWRITE DIRECTORY 'output'
+INSERT OVERWRITE LOCAL DIRECTORY 'output'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
-SELECT letra, COUNT(*) FROM db GROUP BY letra ORDER BY letra;
+SELECT * FROM data_counts;
